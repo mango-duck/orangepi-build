@@ -1,0 +1,41 @@
+name: Build and Deploy Orange Pi
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 获取代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 设置环境变量
+      - name: Set up environment
+        run: |
+          echo "SRC=$(pwd)" >> $GITHUB_ENV
+          echo "LIB_TAG=master" >> $GITHUB_ENV
+
+      # 安装依赖
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl git docker.io
+
+      # 运行构建脚本
+      - name: Run build script
+        run: |
+          bash ./build.sh
+
+      # 发布构建输出（根据需要修改路径）
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: ./output/*
